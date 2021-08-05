@@ -18,10 +18,16 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    public HighScoreHandler highScore;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        print("Player Name: " + DataHandler.Instance.playerName);
+
+        highScore.Init();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -57,7 +63,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene(0);
             }
         }
     }
@@ -66,10 +72,26 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        if (m_Points > highScore.HighScore)
+        {
+            highScore.SaveHighScore(DataHandler.Instance.playerName, m_Points);
+            highScore.LoadHighScore();
+
+            if (!highScore.gameObject.activeSelf)
+            {
+                highScore.gameObject.SetActive(true);
+            }
+        }
     }
 
     public void GameOver()
     {
+        if (m_Points > highScore.HighScore)
+        {
+            highScore.SaveHighScore(DataHandler.Instance.playerName, m_Points);
+        }
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
